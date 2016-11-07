@@ -6,16 +6,35 @@ Page({
         postsList:[],
         hidden:false,
         page:1,
-        tab:'all'
+        tab:'all',
+        pageStyle:{topBar:'top-bar-item',topBarSelet:'top-bar-item top-bar-selected'},
+        topBarType:{all:'',good:'',share:'',ask:'',job:''},
+
     },
     onLoad:function(){
+        this.setTopBarStyle();
         console.log('onLoad by topics');
         this.fetchData();
         console.log('topicsend');
+       
+        
     },
     onPullDownRefresh:function(){
       this.fetchData();
       console.log('下拉刷新',new Date());
+    },
+    onTapTag:function (e){
+      var self = this;
+      var tab = e.currentTarget.id;
+      self.setData({
+        tab:tab
+      });
+      this.setTopBarStyle(tab);
+      if (tab !== 'all') {
+        this.fetchData({tab: tab});
+      } else {
+        this.fetchData();
+      }
     },
     fetchData:function(data){
         var self=this;
@@ -53,6 +72,43 @@ Page({
             // complete
           }
         })
+    },
+  redictDetail:function(e){
+    var id = e.currentTarget.id;
+    var url = "../detail/detail?id="+ id;
+    wx.navigateTo({
+      url: url
+    })
+  },
+  lower: function (e) {
+    var self = this;
+    console.log('lower the view');
+    self.setData({
+      page: self.data.page + 1
+    });
+    if (self.data.tab !== 'all') {
+      this.fetchData({tab: self.data.tab, page: self.data.page});
+    } else {
+      this.fetchData({page: self.data.page});
     }
+  },
+  setTopBarStyle:function(barName){
+    var self = this;
+    var topBarStyle = self.data.pageStyle.topBar;
+    var topBarStyleSelected = self.data.pageStyle.topBarSelet;
+    var topBarType={all:topBarStyle,good:topBarStyle,share:topBarStyle,ask:topBarStyle,job:topBarStyle};
+      if(!barName){
+        barName='all';
+      }
+      for(var k in topBarType){
+          if(k==barName){
+            topBarType[k]=topBarStyleSelected;
+          }
+      }
+    self.setData({
+      topBarType:topBarType
+    });
+        console.log(this.data.topBarType);
+  }
 
 });
